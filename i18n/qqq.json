@@ -1,0 +1,10 @@
+{
+	"@metadata": {
+		"authors": [
+			"Antoine Mercier-Linteau"
+		]
+	},
+	"saferhtmltag-desc": "Extension description.",
+	"saferhtmltag-html-detected-in-edit-page": "An HTML tag has been detected in this page. Only authorized users will be able to modify its content.",
+	"saferhtmltag-denied-edit": "The user has been denied the edit he just made for not having the permission to work with pages including html tags."
+}

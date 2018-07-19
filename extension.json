@@ -1,0 +1,38 @@
+{
+	"name": "SaferHTMLTag",
+	"version": "0.0.1",
+	"author": [
+		"[https://www.mediawiki.org/wiki/User:Tinss Antoine Mercier-Linteau]"
+	],
+	"url": "https://www.mediawiki.org/wiki/Extension:SaferHTMLTag",
+	"descriptionmsg": "saferhtmltag-desc",
+	"license-name": "GPL-2.0-or-later",
+	"type": "other",
+	"requires": {
+		"MediaWiki": ">= 1.31.0"
+	},
+	"AutoloadClasses": {
+		"MediaWiki\\Extension\\SaferHTMLTag\\SaferHTMLTag": "SaferHTMLTag.class.php"
+	},
+	"ConfigRegistry": {
+		"main": "GlobalVarConfig::newInstance"
+	},
+	"config": {
+		"SaferHTMLTagEditorGroup": {
+			"value": false,
+			"description": "User group that is allowed to edit pages using HTML tags. Set to false if only sysops should be allowed."
+		}
+	},
+	"Hooks": {
+		"EditFilterMergedContent": "MediaWiki\\Extension\\SaferHTMLTag\\SaferHTMLTag::onEditFilterMergedContent",
+		"EditPage::showEditForm:initial": "MediaWiki\\Extension\\SaferHTMLTag\\SaferHTMLTag::onEditPage_showEditForm_initial",
+		"TitleGetEditNotices": "MediaWiki\\Extension\\SaferHTMLTag\\SaferHTMLTag::onTitleGetEditNotices",
+		"getUserPermissionsErrors": "MediaWiki\\Extension\\SaferHTMLTag\\SaferHTMLTag::ongetUserPermissionsErrors"
+	},
+	"MessagesDirs": {
+		"SaferHTMLTag": [
+			"i18n"
+		]
+	},
+	"manifest_version": 2
+}
