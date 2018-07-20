@@ -5,6 +5,5 @@
 		]
 	},
 	"saferhtmltag-desc": "SaferHTMLTag is an extension that prevents unauthorized users from editing pages where the <html> tag is defined when raw html ($wgRawHtml) is enabled.",
-	"saferhtmltag-html-detected-in-edit-page": "An HTML tag has been detected in this page. Only authorized users will be able to modify its content.",
-	"saferhtmltag-denied-edit": "The page cannot be edited because it contains an html tag and you don't have the required permission. If you wish to have this page modified, <span class=\"plainlinks\">[{{fullurl:Special:ListUsers|group=sysop}} contact an administrator]</span>."
+	"saferhtmltag-html-detected-in-edit-page": "An HTML tag has been detected in this page. For security reasons, only authorized users will be able to modify its content. If you wish to have this page modified, <span class=\"plainlinks\">[{{fullurl:Special:ListUsers|group=sysop}} contact an administrator]</span>."
 }

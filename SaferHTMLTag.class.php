@@ -24,6 +24,7 @@ use EditPage;
 use OutputPage;
 use Title;
 use WikiPage;
+use RequestContext;
 
 /**
  * SaferHTMLTag extension class.
@@ -68,7 +69,7 @@ class SaferHTMLTag {
 			return true;
 		}
 		
-		if(static::checkUserPermissions(\RequestContext::getMain()->getUser())) { // The user is allowed to edit HTML tags.
+		if(static::checkUserPermissions(RequestContext::getMain()->getUser())) { // The user is allowed to edit HTML tags.
 			
 			/* Ideally, saving pages with HTML tags in them should be considered a sensitive operation, but since
 			 * needing the user to reauthenticate would seriously mess up with the form data or with the visual editor,
@@ -120,7 +121,7 @@ class SaferHTMLTag {
 			return true; // The user can work with HTML tags.
 		}
 		
-		$status->error(wfMessage( 'saferhtmltag-denied-edit' ));
+		$status->error(wfMessage( 'saferhtmltag-html-detected-in-edit-page'));
 		$status->setOk(false);
 		
 		return true; // Continue user interaction, the error has been shown in the status object.
@@ -155,7 +156,7 @@ class SaferHTMLTag {
 		}		
 		
 		if(!$resultCache[$key]) { // The user cannot edit this page.
-			$result = wfMessage( 'saferhtmltag-denied-edit' );
+			$result = wfMessage( 'saferhtmltag-html-detected-in-edit-page');
 			return false;
 		}
 		
