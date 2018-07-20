@@ -1,0 +1,9 @@
+{
+	"@metadata": {
+		"authors": [
+			"Antoine Mercier-Linteau"
+		]
+	},
+	"saferhtmltag-desc": "SaferHTMLTag est une extension empêchant des utilisateurs non autorisés à modifier des pages ou la balise <html> est définie quand l'html brut est activé ($wgRawHtml).",
+	"saferhtmltag-html-detected-in-edit-page": "Une balise HTML a été détectée sur cette page. Pour des raisons de sécurité, seul les utilisateurs autorisés peuvent en modifier le contenu. Si vous désirez modifier cette page, <span class=\"plainlinks\">[{{fullurl:Special:ListUsers|group=sysop}} contactez un administrateur]</span>."
+}
