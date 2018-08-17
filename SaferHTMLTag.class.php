@@ -61,7 +61,7 @@ class SaferHTMLTag {
 	}
 	
 	/**
-	 * Event called when the edit notices for an article has changed
+	 * Event called when the edit notices for an article are rendered.
 	 * @param Title $title the title of the article
 	 * @param int $oldid the id of the version of the article being modified
 	 * @param array $notices the notices in wikitext that are to be displayed
