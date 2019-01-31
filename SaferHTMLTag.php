@@ -21,7 +21,7 @@ if ( function_exists( 'wfLoadExtension' ) ) {
 	);
 	return;
 } else {
-	die( 'This version of the OpenGraphMeta extension requires MediaWiki 1.25+' );
+	die( 'This version of the SaferHTMLTag extension requires MediaWiki 1.25+' );
 }
 
 if ( !defined( 'MEDIAWIKI' ) ) {

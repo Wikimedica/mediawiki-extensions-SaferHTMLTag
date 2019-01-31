@@ -25,12 +25,13 @@ use OutputPage;
 use Title;
 use WikiPage;
 use RequestContext;
-use Elasticsearch\Common\Exceptions\Forbidden403Exception;
 
 /**
  * SaferHTMLTag extension class.
  */
 class SaferHTMLTag {
+	
+	const PERMISSION = 'edit-html';
 	
 	/** 
 	 * Stores page content between events.
@@ -229,15 +230,6 @@ class SaferHTMLTag {
 	 * @return bool true if the user is allowed.
 	 * */
 	public static function checkUserPermissions($user) {
-		
-		global $wgSaferHTMLTagEditorGroup;
-		
-		$groups = ['sysop']; // sysops can always work with HTML tags.
-		
-		if($wgSaferHTMLTagEditorGroup) { // If there is an editor group that can work with HTML tags.
-			$groups[] = $wgSaferHTMLTagEditorGroup;
-		}
-		
-		return !$user->isAnon() && !empty(array_intersect($groups, $user->getGroups())); 
+		return !$user->isAnon() && $user->isAllowed(self::PERMISSION); 
 	}
 }

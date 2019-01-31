@@ -1,6 +1,6 @@
 {
 	"name": "SaferHTMLTag",
-	"version": "0.1a",
+	"version": "0.2b",
 	"author": [
 		"[https://www.mediawiki.org/wiki/User:Tinss Antoine Mercier-Linteau]"
 	],
@@ -16,12 +16,6 @@
 	},
 	"ConfigRegistry": {
 		"main": "GlobalVarConfig::newInstance"
-	},
-	"config": {
-		"SaferHTMLTagEditorGroup": {
-			"value": false,
-			"description": "User group that is allowed to edit pages using HTML tags. Set to false if only sysops should be allowed."
-		}
 	},
 	"Hooks": {
 		"EditFilterMergedContent": "MediaWiki\\Extension\\SaferHTMLTag\\SaferHTMLTag::onEditFilterMergedContent",
