@@ -1,0 +1,9 @@
+{
+	"@metadata": {
+		"authors": [
+			"Antoine Mercier-Linteau"
+		]
+	},
+	"saferhtmltag-desc": "SaferHTMLTag是一个扩展，可以防止未经授权的用户在启用原始HTML($wgRawHtml)设置的Wiki上编辑带有<html>标记的页面。",
+	"saferhtmltag-html-detected-in-edit-page": "本页带有原始HTML标签，出于安全原因，只有特定的用户才能更改其内容。 如果你希望更改此页面上的内容, <span class=\"plainlinks\">[{{fullurl:Special:ListUsers|group=sysop}} 请联系管理员]</span>."
+}
