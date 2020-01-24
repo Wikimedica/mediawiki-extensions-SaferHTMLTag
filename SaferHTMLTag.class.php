@@ -230,6 +230,7 @@ class SaferHTMLTag {
 	 * @return bool true if the user is allowed.
 	 * */
 	public static function checkUserPermissions($user) {
-		return !$user->isAnon() && $user->isAllowed(self::PERMISSION); 
+	    return !$user->isAnon() && 
+	       \MediaWiki\MediaWikiServices::getInstance()->getPermissionManager()->userHasRight($user, self::PERMISSION); 
 	}
 }
