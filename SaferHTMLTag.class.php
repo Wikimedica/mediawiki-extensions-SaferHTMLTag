@@ -168,6 +168,10 @@ class SaferHTMLTag {
 	 * */
 	public static function ongetUserPermissionsErrors( $title, $user, $action, &$result ) {
 
+		if(defined('MW_ENTRY_POINT') && MW_ENTRY_POINT == 'cli' ) {
+			return true; // Do not check permissions in command line mode.
+		}
+		
 		global $wgRawHtml;
 		static $resultCache = []; // Caches the permission results for a user.
 
