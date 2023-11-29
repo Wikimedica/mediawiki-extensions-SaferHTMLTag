@@ -78,7 +78,7 @@ class SaferHTMLTag {
 		if(isset(self::$_data['saferthtmltag-pagecontent'])) { // If the article does not yet exist or is being modified, we should have gotten it's content from onEditPage.
 			$content = self::$_data['saferthtmltag-pagecontent'];
 		} else if($title->exists()) {
-			$content = WikiPage::factory($title)->getContent(); // Get the article's content from the database.
+			$content = static::getPageContent( $title ); // Get the article's content from the database.
 			$content = $content ? $content->getText() : '';  // Make sure $content is not null before calling getText() (to account for rare cases of revisions gone missing).
 		} else {
 			return true;
@@ -193,7 +193,7 @@ class SaferHTMLTag {
 				$resultCache[$key] = true; // The user can work with HTML tags.
 			}
 			else {
-				$resultCache[$key] = !static::contentHasHTMLTags(WikiPage::factory($title)->getContent()->getText());
+				$resultCache[$key] = !static::contentHasHTMLTags( static::getPageContent( $title )->getText() );
 			}
 		}
 
@@ -237,5 +237,18 @@ class SaferHTMLTag {
 	public static function checkUserPermissions($user) {
 	    return !$user->isAnon() &&
 	       \MediaWiki\MediaWikiServices::getInstance()->getPermissionManager()->userHasRight($user, self::PERMISSION);
+	}
+
+	/** Obtain a page's content.
+	 *  Workaround for MediaWiki 1.36+ which deprecated Wikipage::factory.
+	 */
+	private static function getPageContent( $title ) {
+		if ( method_exists( MediaWikiServices::class, 'getWikiPageFactory' ) ) {
+			$wikiPageFactory = MediaWikiServices::getInstance()->getWikiPageFactory();
+			$page = $wikiPageFactory->newFromTitle( $title );
+		} else {
+			$page = WikiPage::factory( $title );
+		}
+		return $page->getContent();
 	}
 }
