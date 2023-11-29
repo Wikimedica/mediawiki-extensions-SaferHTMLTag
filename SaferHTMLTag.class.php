@@ -241,10 +241,12 @@ class SaferHTMLTag {
 
 	/** Obtain a page's content.
 	 *  Workaround for MediaWiki 1.36+ which deprecated Wikipage::factory.
+	 * @param string $title the title of the page
+	 * @return Content content object of the page
 	 */
 	private static function getPageContent( $title ) {
-		if ( method_exists( MediaWikiServices::class, 'getWikiPageFactory' ) ) {
-			$wikiPageFactory = MediaWikiServices::getInstance()->getWikiPageFactory();
+		if ( method_exists( \MediaWiki\MediaWikiServices::class, 'getWikiPageFactory' ) ) {
+			$wikiPageFactory = \MediaWiki\MediaWikiServices::getInstance()->getWikiPageFactory();
 			$page = $wikiPageFactory->newFromTitle( $title );
 		} else {
 			$page = WikiPage::factory( $title );
