@@ -175,7 +175,7 @@ class SaferHTMLTag {
 
 		foreach($args as $arg) { $result .= ';'.$frame->expand($arg); } // Expand all parts of a condition.
 
-		return $resutlt; // Pass the arguments directly so they get interpreted by the parser.
+		return $result; // Pass the arguments directly so they get interpreted by the parser.
 	}
 
 
