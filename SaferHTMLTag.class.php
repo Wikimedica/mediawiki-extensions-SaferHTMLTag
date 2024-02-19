@@ -25,6 +25,7 @@ use OutputPage;
 use Title;
 use WikiPage;
 use RequestContext;
+use Parser;
 
 /**
  * SaferHTMLTag extension class.
@@ -60,6 +61,123 @@ class SaferHTMLTag {
 
 		return true;
 	}
+
+	/**
+	 * Hardcode a safeguard to prevent articles from being saved by unthorized users.
+	 * This prevent obfsucated ways of defining the html tag that have not readily passed contentHasHtmlTag() to get through.
+	 * 
+	 * @param RenderedRevision $renderedRevision representing the planned revision
+	 * @param UserIdentity $user the user saving the article
+	 * @param CommentStoreComment $summary object containing the edit comment
+	 * @param int $flags: All EDIT_… flags (including EDIT_MINOR) as an integer number
+	 * @param Status $hookStatus: if the hook is aborted, error code can be placed into this Status, e.g. $hookStatus->fatal( 'disallowed-by-some-extension' )
+	 * @return false to abort saving the page.
+	 * 
+	 */
+	public static function onMultiContentSave( \MediaWiki\Revision\RenderedRevision $renderedRevision, \MediaWiki\User\UserIdentity $user, \MediaWiki\CommentStore\CommentStoreComment $summary, $flags, $hookStatus ) { 
+		global $wgRawHtml;
+
+		if(!$wgRawHtml) {
+			return true; // Raw HTML has been disabled.
+		}
+
+		if(self::checkUserPermissions($user)) {
+			return true; // Saving can proceed.
+		}
+
+		//Create a diffrent parser to avoid interfering with the first one.
+		$parser = \MediaWiki\MediaWikiServices::getInstance()->getParserFactory()->create();
+
+		$options = \ParserOptions::newFromContext( RequestContext::getMain() );
+
+		$page = $renderedRevision->getRevision()->getPage();
+
+		$parser->startExternalParse( $page, $options, \Parser::OT_HTML );
+		$parser->setHook('html', [__CLASS__, 'htmlOverride']); // Override html tag hook to detect it's presence.
+		$parser->setFunctionHook('if', [__CLASS__, 'conditionOverride'], Parser::SFH_OBJECT_ARGS); // Override if tag hook.
+		$parser->setFunctionHook('ifeq', [__CLASS__, 'conditionOverride'], Parser::SFH_OBJECT_ARGS); // Override ifdeq tag hook.
+		$parser->setFunctionHook('iferror', [__CLASS__, 'conditionOverride'], Parser::SFH_OBJECT_ARGS); // Override iferror tag hook.
+		$parser->setFunctionHook('ifexpr', [__CLASS__, 'conditionOverride'], Parser::SFH_OBJECT_ARGS); // Override ifexpr tag hook.
+		$parser->setFunctionHook('switch', [__CLASS__, 'conditionOverride'], Parser::SFH_OBJECT_ARGS); // Override switch tag hook.
+		$parser->setFunctionHook('ifexist', [__CLASS__, 'conditionOverride'], Parser::SFH_OBJECT_ARGS); // Override ifexist tag hook.
+		// $parser->clearTagHooks(); // cannot be used because this would clear the #tag hook which could be used to call the html tag.
+
+		$content = $renderedRevision->getRevision()->getContent( \MediaWiki\Revision\SlotRecord::MAIN );
+		if ( !( $content instanceof \TextContent ) ) {
+			return true; // Not implemented on non-text contents.
+		}
+		/*
+		Parse the text, relying on MediaWiki's ability to detect html tags. Should there be one, the overriden html hook will be called.
+
+		This allows the detection of obfuscated ways of defining an html tag such as:
+		* {{#tag:h{{ns:0}}tml|<script>alert(1)</script>}}
+		* {{#ifexpr:{{safesubt:#time:U}}+20 > {{#time:U}}|{{#tag:h{{ns:0}}tml|<script>alert(1)</script>}}}} // Will output html tag 20s after the page has been saved.
+		*/
+		//$text = $parser->recursiveTagParseFully( $content->getText() );
+		$parser->parse($content->getText(), $page, $options);
+
+		if(!self::$_usesHtmlTag) {
+			return true;
+		}
+
+		// There was an html call in the wikicode.
+
+		self::$_usesHtmlTag = false; // Reset in case that hook gets called again.
+
+		$hookStatus->fatal('saferhtmltag-html-detected-in-edit-page');
+
+		return false; // Abort saving.
+	}
+
+	/** @param bool if a call to the html tag was made during parsing. */
+	private static $_usesHtmlTag = false;
+
+	/**
+	 * Parser hook override for checking the presence of the HTML tag.
+	 * 
+	 * @param ?string $content
+	 * @param array $attributes
+	 * @param Parser $parser
+	 * @param PPFrame $frame
+	 * @return string
+	 */
+	public static function htmlOverride(?string $content, array $attributes, $parser, $frame) {
+		
+		if($parser->getTitle()->getFullText() != $frame->getTitle()->getFullText())	{
+			/* If the titles do not match, this means the expression being expanded is in a different page. 
+			 * Having html tags in templates is fine because we can assume they were created by users with the required rights. */
+			return '';
+		}
+		
+		self::$_usesHtmlTag = true; // A call to the html tag was made.
+		return '';
+	}
+
+	/**
+	 * Parser hook override conditions type parser hooks. This allows call such as
+	 * {{#ifexpr:{{safesubt:#time:U}}+20 > {{#time:U}}|{{#tag:h{{ns:0}}tml|<script>alert(1)</script>}}}}
+	 * to be parser no matter what trick a hacker uses to prevent detection of the html tag.
+	 * 
+	 * @param Parser $parser
+	 * @param PPFrame $frame
+	 * @param PPNode[] $args
+	 * @return string
+	 */
+	public static function conditionOverride($parser, $frame, array $args) {
+		
+		if($parser->getTitle()->getFullText() != $frame->getTitle()->getFullText())	{
+			/* If the titles do not match, this means the expression being expanded is in a different page. 
+			 * Having html tags in templates is fine because we can assume they were created by users with the required rights. */
+			return '';
+		}
+		
+		$result = '';
+
+		foreach($args as $arg) { $result .= ';'.$frame->expand($arg); } // Expand all parts of a condition.
+
+		return $resutlt; // Pass the arguments directly so they get interpreted by the parser.
+	}
+
 
 	/**
 	 * Event called when the edit notices for an article are rendered.
@@ -206,7 +324,9 @@ class SaferHTMLTag {
 	}
 
 	/**
-	 * Parse a string for the presence of HTML tags.
+	 * Parse a string for the presence of HTML tags. This does a simple string bases check to make things quick.
+	 * onMultiContentSave() does full reparse of the text to prevent obfuscated ways of defining the tag to get through.
+	 * 
 	 * @param string $content the text to parse
 	 * @return bool true of $content has HTML tags
 	 * */

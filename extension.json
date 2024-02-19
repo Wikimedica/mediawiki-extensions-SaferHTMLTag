@@ -21,7 +21,8 @@
 		"EditFilterMergedContent": "MediaWiki\\Extension\\SaferHTMLTag\\SaferHTMLTag::onEditFilterMergedContent",
 		"EditPage::showEditForm:initial": "MediaWiki\\Extension\\SaferHTMLTag\\SaferHTMLTag::onEditPage_showEditForm_initial",
 		"TitleGetEditNotices": "MediaWiki\\Extension\\SaferHTMLTag\\SaferHTMLTag::onTitleGetEditNotices",
-		"getUserPermissionsErrors": "MediaWiki\\Extension\\SaferHTMLTag\\SaferHTMLTag::ongetUserPermissionsErrors"
+		"getUserPermissionsErrors": "MediaWiki\\Extension\\SaferHTMLTag\\SaferHTMLTag::ongetUserPermissionsErrors",
+		"MultiContentSave": "MediaWiki\\Extension\\SaferHTMLTag\\SaferHTMLTag::onMultiContentSave"
 	},
 	"MessagesDirs": {
 		"SaferHTMLTag": [
