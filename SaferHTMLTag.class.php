@@ -173,7 +173,17 @@ class SaferHTMLTag {
 		
 		$result = '';
 
-		foreach($args as $arg) { $result .= ';'.$frame->expand($arg); } // Expand all parts of a condition.
+		foreach($args as $arg) 
+		{ 
+			$e = str_replace(' ', '', $frame->expand($arg)); // Expand all parts of a condition.
+
+			// The following code prevents trikcs such as {{#{{#ifexpr:{{#time:U}}+10>1708471495|ta{{ns:0}}g:   html|if:}}|<script>alert(1)</script>}} from working.
+			if(strpos($e, 'tag:html') !== false) {
+				self::$_usesHtmlTag = true;
+			}
+
+			$result .= ';'.$e;
+		}
 
 		return $result; // Pass the arguments directly so they get interpreted by the parser.
 	}
