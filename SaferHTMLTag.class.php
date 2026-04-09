@@ -20,12 +20,12 @@
 
 namespace MediaWiki\Extension\SaferHTMLTag;
 
-use EditPage;
-use OutputPage;
-use Title;
+use MediaWiki\EditPage\EditPage;
+use MediaWiki\Output\OutputPage;
+use MediaWiki\Title\Title;
 use WikiPage;
-use RequestContext;
-use Parser;
+use MediaWiki\Context\RequestContext;
+use MediaWiki\Parser\Parser;
 
 /**
  * SaferHTMLTag extension class.
@@ -379,7 +379,7 @@ class SaferHTMLTag {
 			$wikiPageFactory = \MediaWiki\MediaWikiServices::getInstance()->getWikiPageFactory();
 			$page = $wikiPageFactory->newFromTitle( $title );
 		} else {
-			$page = WikiPage::factory( $title );
+			$page = \MediaWiki\MediaWikiServices::getInstance()->getWikiPageFactory()->newFromTitle( $title );
 		}
 		return $page->getContent();
 	}
