@@ -94,12 +94,15 @@ class SaferHTMLTag {
 
 		$parser->startExternalParse( $page, $options, \Parser::OT_HTML );
 		$parser->setHook('html', [__CLASS__, 'htmlOverride']); // Override html tag hook to detect it's presence.
-		$parser->setFunctionHook('if', [__CLASS__, 'conditionOverride'], Parser::SFH_OBJECT_ARGS); // Override if tag hook.
-		$parser->setFunctionHook('ifeq', [__CLASS__, 'conditionOverride'], Parser::SFH_OBJECT_ARGS); // Override ifdeq tag hook.
-		$parser->setFunctionHook('iferror', [__CLASS__, 'conditionOverride'], Parser::SFH_OBJECT_ARGS); // Override iferror tag hook.
-		$parser->setFunctionHook('ifexpr', [__CLASS__, 'conditionOverride'], Parser::SFH_OBJECT_ARGS); // Override ifexpr tag hook.
-		$parser->setFunctionHook('switch', [__CLASS__, 'conditionOverride'], Parser::SFH_OBJECT_ARGS); // Override switch tag hook.
-		$parser->setFunctionHook('ifexist', [__CLASS__, 'conditionOverride'], Parser::SFH_OBJECT_ARGS); // Override ifexist tag hook.
+		// The condition functions are provided by ParserFunctions, setFunctionHook() throws for unknown magic words without it.
+		if ( \ExtensionRegistry::getInstance()->isLoaded( 'ParserFunctions' ) ) {
+			$parser->setFunctionHook('if', [__CLASS__, 'conditionOverride'], Parser::SFH_OBJECT_ARGS); // Override if tag hook.
+			$parser->setFunctionHook('ifeq', [__CLASS__, 'conditionOverride'], Parser::SFH_OBJECT_ARGS); // Override ifdeq tag hook.
+			$parser->setFunctionHook('iferror', [__CLASS__, 'conditionOverride'], Parser::SFH_OBJECT_ARGS); // Override iferror tag hook.
+			$parser->setFunctionHook('ifexpr', [__CLASS__, 'conditionOverride'], Parser::SFH_OBJECT_ARGS); // Override ifexpr tag hook.
+			$parser->setFunctionHook('switch', [__CLASS__, 'conditionOverride'], Parser::SFH_OBJECT_ARGS); // Override switch tag hook.
+			$parser->setFunctionHook('ifexist', [__CLASS__, 'conditionOverride'], Parser::SFH_OBJECT_ARGS); // Override ifexist tag hook.
+		}
 		// $parser->clearTagHooks(); // cannot be used because this would clear the #tag hook which could be used to call the html tag.
 
 		$content = $renderedRevision->getRevision()->getContent( \MediaWiki\Revision\SlotRecord::MAIN );
